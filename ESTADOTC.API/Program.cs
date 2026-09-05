@@ -1,4 +1,9 @@
+using ESTADOTC.API.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
+
+// Registra la fábrica de conexiones a SQL Server para su inyección mediante Dependency Injection.
+builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
 
 // Add services to the container.
 
