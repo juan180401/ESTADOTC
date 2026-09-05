@@ -30,4 +30,34 @@ public class CardRepository : ICardRepository
             parameters,
             commandType: CommandType.StoredProcedure);
     }
+
+    public async Task<CardFinancialSummary?> GetFinancialSummaryAsync(int cardId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var parameters = new
+        {
+            CardId = cardId
+        };
+
+        return await connection.QueryFirstOrDefaultAsync<CardFinancialSummary>(
+            "dbo.sp_GetCardFinancialSummary",
+            parameters,
+            commandType: CommandType.StoredProcedure);
+    }
+
+    public async Task<MonthlyPurchaseTotals?> GetMonthlyPurchaseTotalsAsync(int cardId)
+    {
+        using var connection = _connectionFactory.CreateConnection();
+
+        var parameters = new
+        {
+            CardId = cardId
+        };
+
+        return await connection.QueryFirstOrDefaultAsync<MonthlyPurchaseTotals>(
+            "dbo.sp_GetMonthlyPurchaseTotals",
+            parameters,
+            commandType: CommandType.StoredProcedure);
+    }
 }
