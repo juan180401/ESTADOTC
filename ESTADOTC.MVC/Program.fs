@@ -17,6 +17,7 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.Options
 open ESTADOTC.MVC.Models
+open ESTADOTC.MVC.Services
 
 module Program =
     let exitCode = 0
@@ -44,6 +45,7 @@ module Program =
                 client.BaseAddress <- Uri(settings.BaseUrl)
                 client
         )
+        builder.Services.AddScoped<ICardApiService, CardApiService>()
 
         let app = builder.Build()
 
