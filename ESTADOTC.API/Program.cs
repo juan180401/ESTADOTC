@@ -2,6 +2,7 @@ using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
 using ESTADOTC.API.Application.Mapping;
 using ESTADOTC.API.Application.Validators;
 using ESTADOTC.API.Infrastructure.Data;
+using ESTADOTC.API.Infrastructure.Middleware;
 using ESTADOTC.API.Infrastructure.Repositories;
 using ESTADOTC.API.Infrastructure.Repositories.Interfaces;
 using ESTADOTC.API.Infrastructure.UnitOfWork;
@@ -36,6 +37,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 app.UseHttpsRedirection();
 
