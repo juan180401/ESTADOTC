@@ -16,5 +16,8 @@
         public decimal MinimumPaymentRate { get; set; }
 
         public DateTime CreatedAt { get; set; }
+
+        public decimal CurrentBalance { get; set; }
+        public decimal AvailableBalance { get; set; }
     }
 }

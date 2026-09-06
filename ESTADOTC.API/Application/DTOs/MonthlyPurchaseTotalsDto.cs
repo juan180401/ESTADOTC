@@ -1,6 +1,6 @@
-﻿namespace ESTADOTC.API.Domain.Entities;
+﻿namespace ESTADOTC.API.Application.DTOs;
 
-public class MonthlyPurchaseTotals
+public class MonthlyPurchaseTotalsDto
 {
     public decimal CurrentMonthPurchases { get; set; }
     public decimal PreviousMonthPurchases { get; set; }

@@ -16,6 +16,12 @@ namespace ESTADOTC.API.Infrastructure.Data
 
         public IDbConnection CreateConnection()
         {
+            if (string.IsNullOrWhiteSpace(_connectionString))
+            {
+                throw new InvalidOperationException(
+                    "La cadena de conexión está vacía.");
+            }
+
             return new SqlConnection(_connectionString);
         }
     }

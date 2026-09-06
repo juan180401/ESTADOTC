@@ -1,6 +1,6 @@
-﻿namespace ESTADOTC.API.Domain.Entities;
+﻿namespace ESTADOTC.API.Application.DTOs;
 
-public class CardFinancialSummary
+public class CardFinancialSummaryDto
 {
     public decimal CurrentBalance { get; set; }
     public decimal BonifiableInterest { get; set; }
