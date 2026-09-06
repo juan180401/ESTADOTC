@@ -15,6 +15,8 @@ open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.Logging
+open Microsoft.Extensions.Options
+open ESTADOTC.MVC.Models
 
 module Program =
     let exitCode = 0
@@ -29,6 +31,19 @@ module Program =
             .AddRazorRuntimeCompilation()
 
         builder.Services.AddRazorPages()
+        builder.Services.Configure<ApiSettings>(
+            builder.Configuration.GetSection("ApiSettings"))
+        builder.Services.AddHttpClient(
+            "ESTADOTC.API",
+            fun client ->
+                let settings =
+                    builder.Configuration
+                        .GetSection("ApiSettings")
+                        .Get<ApiSettings>()
+
+                client.BaseAddress <- Uri(settings.BaseUrl)
+                client
+        )
 
         let app = builder.Build()
 
