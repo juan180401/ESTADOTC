@@ -1,6 +1,7 @@
-﻿using MediatR;
+﻿using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
+using ESTADOTC.API.Application.CQRS.Queries.GetTransactions;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
 
 namespace ESTADOTC.API.Controllers;
 
@@ -28,6 +29,18 @@ public class CardsController : ControllerBase
         {
             return NotFound();
         }
+
+        return Ok(result);
+    }
+
+    [HttpGet("{cardId}/transactions")]
+    public async Task<IActionResult> GetTransactions(
+    int cardId,
+    CancellationToken cancellationToken)
+    {
+        var query = new GetTransactionsQuery(cardId);
+
+        var result = await _mediator.Send(query, cancellationToken);
 
         return Ok(result);
     }
