@@ -1,0 +1,17 @@
+﻿@model ESTADOTC.MVC.Models.CardStatementViewModel
+
+@{
+    ViewData["Title"] = "Estado de cuenta";
+}
+
+<h1>Estado de cuenta</h1>
+
+<div>
+    <p><strong>Tarjeta:</strong> @Model.CardNumber</p>
+    <p><strong>Tarjetahabiente:</strong> @Model.HolderName</p>
+    <p><strong>Límite de crédito:</strong> @Model.CreditLimit.ToString("C")</p>
+    <p><strong>Saldo actual:</strong> @Model.CurrentBalance.ToString("C")</p>
+    <p><strong>Disponible:</strong> @Model.AvailableBalance.ToString("C")</p>
+    <p><strong>Tasa de interés:</strong> @Model.InterestRate%</p>
+    <p><strong>Pago mínimo:</strong> @Model.MinimumPaymentRate%</p>
+</div>
