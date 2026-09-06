@@ -1,5 +1,7 @@
-﻿using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
+﻿using ESTADOTC.API.Application.CQRS.Queries.GetCardFinancialSummary;
+using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
 using ESTADOTC.API.Application.CQRS.Queries.GetCurrentMonthTransactions;
+using ESTADOTC.API.Application.CQRS.Queries.GetMonthlyPurchaseTotals;
 using ESTADOTC.API.Application.CQRS.Queries.GetTransactions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -54,6 +56,40 @@ public class CardsController : ControllerBase
         var query = new GetCurrentMonthTransactionsQuery(cardId);
 
         var result = await _mediator.Send(query, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpGet("{cardId}/monthly-purchase-totals")]
+    public async Task<IActionResult> GetMonthlyPurchaseTotals(
+        int cardId,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetMonthlyPurchaseTotalsQuery(cardId);
+
+        var result = await _mediator.Send(query, cancellationToken);
+
+        if (result is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(result);
+    }
+
+    [HttpGet("{cardId}/financial-summary")]
+    public async Task<IActionResult> GetFinancialSummary(
+        int cardId,
+        CancellationToken cancellationToken)
+    {
+        var query = new GetCardFinancialSummaryQuery(cardId);
+
+        var result = await _mediator.Send(query, cancellationToken);
+
+        if (result is null)
+        {
+            return NotFound();
+        }
 
         return Ok(result);
     }

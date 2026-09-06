@@ -2,6 +2,6 @@
 
 public class MonthlyPurchaseTotals
 {
-    public decimal CurrentMonthTotal { get; set; }
-    public decimal PreviousMonthTotal { get; set; }
+    public decimal CurrentMonthPurchases { get; set; }
+    public decimal PreviousMonthPurchases { get; set; }
 }
