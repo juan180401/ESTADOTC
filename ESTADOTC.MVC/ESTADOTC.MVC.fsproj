@@ -4,12 +4,16 @@
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Compile Include="Models/ErrorViewModel.fs" />
-    <Compile Include="Controllers/HomeController.fs" />
-    <Compile Include="Models\ApiSettings.fs" />
-    <Compile Include="Program.fs" />
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="Controllers/HomeController.fs" />
+		<Compile Include="Models\ApiSettings.fs" />
+		<Compile Include="Models\CardFinancialSummaryViewModel.fs" />
+		<Compile Include="Models\CardStatementViewModel.fs" />
+		<Compile Include="Models\MonthlyPurchaseTotalsViewModel.fs" />
+		<Compile Include="Models\TransactionViewModel.fs" />
+		<Compile Include="Services\ICardApiService.fs" />
+		<Compile Include="Program.fs" />
+	</ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.36" />
