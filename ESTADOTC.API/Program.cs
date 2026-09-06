@@ -1,3 +1,4 @@
+using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
 using ESTADOTC.API.Infrastructure.Data;
 using ESTADOTC.API.Infrastructure.Repositories;
 using ESTADOTC.API.Infrastructure.Repositories.Interfaces;
@@ -9,6 +10,8 @@ builder.Services.AddScoped<IDbConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddMediatR(cfg =>
+    cfg.RegisterServicesFromAssemblyContaining<GetCardStatementQueryHandler>());
 
 // Add services to the container.
 
