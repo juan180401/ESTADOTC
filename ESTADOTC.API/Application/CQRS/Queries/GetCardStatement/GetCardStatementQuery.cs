@@ -1,6 +1,7 @@
 ﻿using MediatR;
-using ESTADOTC.API.Domain.Entities;
+using ESTADOTC.API.Application.DTOs;
 
 namespace ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
 
-public record GetCardStatementQuery(int CardId) : IRequest<Card?>;
+public record GetCardStatementQuery(int CardId)
+    : IRequest<CardStatementDto?>;

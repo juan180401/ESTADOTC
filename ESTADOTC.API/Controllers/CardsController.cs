@@ -5,6 +5,7 @@ using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
 using ESTADOTC.API.Application.CQRS.Queries.GetCurrentMonthTransactions;
 using ESTADOTC.API.Application.CQRS.Queries.GetMonthlyPurchaseTotals;
 using ESTADOTC.API.Application.CQRS.Queries.GetTransactions;
+using ESTADOTC.API.Application.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -99,13 +100,14 @@ public class CardsController : ControllerBase
     [HttpPost("{cardId}/purchases")]
     public async Task<IActionResult> AddPurchase(
     int cardId,
-    [FromBody] AddPurchaseCommand command,
+    [FromBody] AddPurchaseDto dto,
     CancellationToken cancellationToken)
     {
-        if (cardId != command.CardId)
-        {
-            return BadRequest("El CardId de la URL no coincide con el CardId enviado.");
-        }
+        var command = new AddPurchaseCommand(
+            cardId,
+            dto.TransactionDate,
+            dto.Description,
+            dto.Amount);
 
         await _mediator.Send(command, cancellationToken);
 
@@ -115,13 +117,13 @@ public class CardsController : ControllerBase
     [HttpPost("{cardId}/payments")]
     public async Task<IActionResult> AddPayment(
         int cardId,
-        [FromBody] AddPaymentCommand command,
+        [FromBody] AddPaymentDto dto,
         CancellationToken cancellationToken)
     {
-        if (cardId != command.CardId)
-        {
-            return BadRequest("El CardId de la URL no coincide con el CardId enviado.");
-        }
+        var command = new AddPaymentCommand(
+            cardId,
+            dto.TransactionDate,
+            dto.Amount);
 
         await _mediator.Send(command, cancellationToken);
 

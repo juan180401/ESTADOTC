@@ -1,5 +1,6 @@
-﻿using MediatR;
-using ESTADOTC.API.Domain.Entities;
+﻿using AutoMapper;
+using MediatR;
+using ESTADOTC.API.Application.DTOs;
 using ESTADOTC.API.Infrastructure.Repositories.Interfaces;
 
 namespace ESTADOTC.API.Application.CQRS.Queries.GetMonthlyPurchaseTotals;
@@ -7,21 +8,28 @@ namespace ESTADOTC.API.Application.CQRS.Queries.GetMonthlyPurchaseTotals;
 public class GetMonthlyPurchaseTotalsQueryHandler
     : IRequestHandler<
         GetMonthlyPurchaseTotalsQuery,
-        MonthlyPurchaseTotals?>
+        MonthlyPurchaseTotalsDto?>
 {
     private readonly ICardRepository _cardRepository;
+    private readonly IMapper _mapper;
 
     public GetMonthlyPurchaseTotalsQueryHandler(
-        ICardRepository cardRepository)
+        ICardRepository cardRepository,
+        IMapper mapper)
     {
         _cardRepository = cardRepository;
+        _mapper = mapper;
     }
 
-    public async Task<MonthlyPurchaseTotals?> Handle(
+    public async Task<MonthlyPurchaseTotalsDto?> Handle(
         GetMonthlyPurchaseTotalsQuery request,
         CancellationToken cancellationToken)
     {
-        return await _cardRepository
+        var result = await _cardRepository
             .GetMonthlyPurchaseTotalsAsync(request.CardId);
+
+        return result is null
+            ? null
+            : _mapper.Map<MonthlyPurchaseTotalsDto>(result);
     }
 }
