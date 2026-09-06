@@ -1,4 +1,5 @@
 ﻿using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
+using ESTADOTC.API.Application.CQRS.Queries.GetCurrentMonthTransactions;
 using ESTADOTC.API.Application.CQRS.Queries.GetTransactions;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -39,6 +40,18 @@ public class CardsController : ControllerBase
     CancellationToken cancellationToken)
     {
         var query = new GetTransactionsQuery(cardId);
+
+        var result = await _mediator.Send(query, cancellationToken);
+
+        return Ok(result);
+    }
+
+    [HttpGet("{cardId}/transactions/current-month")]
+    public async Task<IActionResult> GetCurrentMonthTransactions(
+    int cardId,
+    CancellationToken cancellationToken)
+    {
+        var query = new GetCurrentMonthTransactionsQuery(cardId);
 
         var result = await _mediator.Send(query, cancellationToken);
 
