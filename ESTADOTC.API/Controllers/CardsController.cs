@@ -1,4 +1,6 @@
-﻿using ESTADOTC.API.Application.CQRS.Queries.GetCardFinancialSummary;
+﻿using ESTADOTC.API.Application.CQRS.Commands.AddPayment;
+using ESTADOTC.API.Application.CQRS.Commands.AddPurchase;
+using ESTADOTC.API.Application.CQRS.Queries.GetCardFinancialSummary;
 using ESTADOTC.API.Application.CQRS.Queries.GetCardStatement;
 using ESTADOTC.API.Application.CQRS.Queries.GetCurrentMonthTransactions;
 using ESTADOTC.API.Application.CQRS.Queries.GetMonthlyPurchaseTotals;
@@ -92,5 +94,37 @@ public class CardsController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [HttpPost("{cardId}/purchases")]
+    public async Task<IActionResult> AddPurchase(
+    int cardId,
+    [FromBody] AddPurchaseCommand command,
+    CancellationToken cancellationToken)
+    {
+        if (cardId != command.CardId)
+        {
+            return BadRequest("El CardId de la URL no coincide con el CardId enviado.");
+        }
+
+        await _mediator.Send(command, cancellationToken);
+
+        return Ok();
+    }
+
+    [HttpPost("{cardId}/payments")]
+    public async Task<IActionResult> AddPayment(
+        int cardId,
+        [FromBody] AddPaymentCommand command,
+        CancellationToken cancellationToken)
+    {
+        if (cardId != command.CardId)
+        {
+            return BadRequest("El CardId de la URL no coincide con el CardId enviado.");
+        }
+
+        await _mediator.Send(command, cancellationToken);
+
+        return Ok();
     }
 }
