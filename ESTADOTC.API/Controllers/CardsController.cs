@@ -23,6 +23,8 @@ public class CardsController : ControllerBase
     }
 
     [HttpGet("{cardId}/statement")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCardStatement(
         int cardId,
         CancellationToken cancellationToken)
@@ -40,6 +42,8 @@ public class CardsController : ControllerBase
     }
 
     [HttpGet("{cardId}/transactions")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetTransactions(
     int cardId,
     CancellationToken cancellationToken)
@@ -52,6 +56,8 @@ public class CardsController : ControllerBase
     }
 
     [HttpGet("{cardId}/transactions/current-month")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetCurrentMonthTransactions(
     int cardId,
     CancellationToken cancellationToken)
@@ -64,6 +70,8 @@ public class CardsController : ControllerBase
     }
 
     [HttpGet("{cardId}/monthly-purchase-totals")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetMonthlyPurchaseTotals(
         int cardId,
         CancellationToken cancellationToken)
@@ -81,6 +89,8 @@ public class CardsController : ControllerBase
     }
 
     [HttpGet("{cardId}/financial-summary")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetFinancialSummary(
         int cardId,
         CancellationToken cancellationToken)
@@ -98,6 +108,8 @@ public class CardsController : ControllerBase
     }
 
     [HttpPost("{cardId}/purchases")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddPurchase(
     int cardId,
     [FromBody] AddPurchaseDto dto,
@@ -115,6 +127,8 @@ public class CardsController : ControllerBase
     }
 
     [HttpPost("{cardId}/payments")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddPayment(
         int cardId,
         [FromBody] AddPaymentDto dto,
