@@ -6,15 +6,20 @@
 
 	<ItemGroup>
 		<Compile Include="Controllers/HomeController.fs" />
-		<Compile Include="Models\AddPaymentViewModel.fs" />
-		<Compile Include="Models\AddPurchaseViewModel.fs" />
+
 		<Compile Include="Models\ApiSettings.fs" />
+		<Compile Include="Models\AddPurchaseViewModel.fs" />
+		<Compile Include="Models\AddPaymentViewModel.fs" />
 		<Compile Include="Models\CardFinancialSummaryViewModel.fs" />
 		<Compile Include="Models\CardStatementViewModel.fs" />
 		<Compile Include="Models\MonthlyPurchaseTotalsViewModel.fs" />
 		<Compile Include="Models\TransactionViewModel.fs" />
+
 		<Compile Include="Services\ICardApiService.fs" />
 		<Compile Include="Services\CardApiService.fs" />
+
+		<Compile Include="Controllers\CardController.fs" />
+
 		<Compile Include="Program.fs" />
 	</ItemGroup>
 
