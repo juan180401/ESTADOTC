@@ -129,3 +129,14 @@ type CardController(apiService: ICardApiService) =
 
                 return this.RedirectToAction("Index") :> IActionResult
         }
+    
+    [<HttpGet>]
+    member this.Transactions() =
+        task {
+            let cardId = 1
+
+            let! transactions =
+                apiService.GetTransactionsAsync(cardId)
+
+            return this.View(transactions)
+        }
