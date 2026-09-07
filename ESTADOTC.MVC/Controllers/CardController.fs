@@ -87,3 +87,45 @@ type CardController(apiService: ICardApiService) =
 
                 return this.RedirectToAction("Index") :> IActionResult
         }
+
+    [<HttpGet>]
+    member this.Payment() =
+        let model =
+            {
+                TransactionDate = DateTime.Today
+                Amount = 0M
+            }
+
+        this.View(model)
+
+    [<HttpPost>]
+    [<ValidateAntiForgeryToken>]
+    member this.Payment(
+        transactionDate: DateTime,
+        amount: decimal
+    ) : Task<IActionResult> =
+        task {
+            if amount <= 0M then
+                this.ModelState.AddModelError(
+                    "Amount",
+                    "El monto debe ser mayor que cero."
+                )
+
+            if not this.ModelState.IsValid then
+                let model =
+                    {
+                        TransactionDate = transactionDate
+                        Amount = amount
+                    }
+
+                return this.View(model) :> IActionResult
+            else
+                do!
+                    apiService.AddPaymentAsync(
+                        1,
+                        transactionDate,
+                        amount
+                    )
+
+                return this.RedirectToAction("Index") :> IActionResult
+        }
