@@ -1,0 +1,103 @@
+﻿@model ESTADOTC.MVC.Models.AddPurchaseViewModel
+
+@{
+    ViewData["Title"] = "Registrar compra";
+}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">Registrar compra</h1>
+            <p class="text-muted mb-0">
+                Registra una nueva compra en tu tarjeta
+            </p>
+        </div>
+
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            ← Volver
+        </a>
+    </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-4">
+
+            <form asp-action="Purchase" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        Fecha de compra
+                    </label>
+
+                    <input type="date"
+                           name="transactionDate"
+                           class="form-control"
+                           value="@Model.TransactionDate.ToString(" yyyy-MM-dd")" />
+
+                    <span class="text-danger"
+                          data-valmsg-for="transactionDate">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">
+                        Descripción
+                    </label>
+
+                    <input type="text"
+                           name="description"
+                           class="form-control"
+                           placeholder="Ej. Compra en supermercado"
+                           value="@Model.Description" />
+
+                    <span class="text-danger">
+                        @ViewData.ModelState["Description"]?.Errors.FirstOrDefault()?.ErrorMessage
+                    </span>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Monto
+                    </label>
+
+                    <div class="input-group">
+                        <span class="input-group-text">$</span>
+
+                        <input type="number"
+                               name="amount"
+                               class="form-control"
+                               step="0.01"
+                               min="0.01"
+                               placeholder="0.00"
+                               value="@(Model.Amount == 0M ? " " : Model.Amount.ToString(" 0.00"))" />
+                    </div>
+
+                    <span class="text-danger">
+                        @ViewData.ModelState["Amount"]?.Errors.FirstOrDefault()?.ErrorMessage
+                    </span>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <a asp-action="Index"
+                       class="btn btn-outline-secondary">
+                        Cancelar
+                    </a>
+
+                    <button type="submit"
+                            class="btn btn-primary px-4">
+                        Registrar compra
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
