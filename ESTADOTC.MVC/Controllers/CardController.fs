@@ -85,6 +85,7 @@ type CardController(apiService: ICardApiService) =
                         amount
                     )
 
+                this.TempData["SuccessMessage"] <- "Compra registrada correctamente."
                 return this.RedirectToAction("Index") :> IActionResult
         }
 
@@ -127,6 +128,7 @@ type CardController(apiService: ICardApiService) =
                         amount
                     )
 
+                this.TempData["SuccessMessage"] <- "Pago registrado correctamente."
                 return this.RedirectToAction("Index") :> IActionResult
         }
     
