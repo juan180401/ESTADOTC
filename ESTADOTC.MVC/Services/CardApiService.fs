@@ -35,7 +35,7 @@ type CardApiService(httpClient: HttpClient) =
 
     member _.GetMonthlyPurchaseTotalsAsync(cardId: int) =
         httpClient.GetFromJsonAsync<MonthlyPurchaseTotalsViewModel>(
-            $"api/cards/{cardId}/purchases/monthly"
+            $"api/cards/{cardId}/monthly-purchase-totals"
         )
 
     member _.GetFinancialSummaryAsync(cardId: int) =
