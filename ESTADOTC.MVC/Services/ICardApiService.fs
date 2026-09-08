@@ -30,3 +30,6 @@ type ICardApiService =
         cardId: int *
         transactionDate: DateTime *
         amount: decimal -> Task
+
+    abstract member DownloadStatementPdfAsync:
+        cardId: int -> Task<byte array>

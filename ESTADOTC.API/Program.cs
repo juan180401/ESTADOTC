@@ -7,6 +7,7 @@ using ESTADOTC.API.Infrastructure.Middleware;
 using ESTADOTC.API.Infrastructure.Repositories;
 using ESTADOTC.API.Infrastructure.Repositories.Interfaces;
 using ESTADOTC.API.Infrastructure.UnitOfWork;
+using ESTADOTC.API.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 
@@ -21,6 +22,7 @@ builder.Services.AddMediatR(cfg =>
     cfg.RegisterServicesFromAssemblyContaining<GetCardStatementQueryHandler>());
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddScoped<IDatabaseHealthCheck, DatabaseHealthCheck>();
+builder.Services.AddScoped<CardStatementPdfService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<AddPurchaseDtoValidator>();
 

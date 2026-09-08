@@ -6,8 +6,10 @@ using ESTADOTC.API.Application.CQRS.Queries.GetCurrentMonthTransactions;
 using ESTADOTC.API.Application.CQRS.Queries.GetMonthlyPurchaseTotals;
 using ESTADOTC.API.Application.CQRS.Queries.GetTransactions;
 using ESTADOTC.API.Application.DTOs;
+using ESTADOTC.API.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace ESTADOTC.API.Controllers;
 
@@ -16,10 +18,14 @@ namespace ESTADOTC.API.Controllers;
 public class CardsController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly CardStatementPdfService _pdfService;
 
-    public CardsController(IMediator mediator)
+    public CardsController(
+        IMediator mediator,
+        CardStatementPdfService pdfService)
     {
         _mediator = mediator;
+        _pdfService = pdfService;
     }
 
     [HttpGet("{cardId}/statement")]
@@ -105,6 +111,76 @@ public class CardsController : ControllerBase
         }
 
         return Ok(result);
+    }
+
+    [HttpGet("{cardId}/statement/pdf")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetCardStatementPdf(
+    int cardId,
+    CancellationToken cancellationToken)
+    {
+        var statement = await _mediator.Send(
+            new GetCardStatementQuery(cardId),
+            cancellationToken);
+
+        if (statement is null)
+        {
+            return NotFound();
+        }
+
+        var financialSummary = await _mediator.Send(
+            new GetCardFinancialSummaryQuery(cardId),
+            cancellationToken);
+
+        if (financialSummary is null)
+        {
+            return NotFound();
+        }
+
+        var monthlyTotals = await _mediator.Send(
+            new GetMonthlyPurchaseTotalsQuery(cardId),
+            cancellationToken);
+
+        if (monthlyTotals is null)
+        {
+            return NotFound();
+        }
+
+        var transactions = await _mediator.Send(
+            new GetCurrentMonthTransactionsQuery(cardId),
+            cancellationToken);
+
+        var pdfTransactions = transactions
+            .Select(transaction => new PdfTransaction
+            {
+                TransactionDate = transaction.TransactionDate,
+                Description = transaction.Description ?? string.Empty,
+                TransactionType = transaction.TransactionType,
+                Amount = transaction.Amount
+            })
+            .ToList();
+
+        var pdf = _pdfService.Generate(
+            statement.HolderName,
+            statement.CardNumber,
+            statement.CurrentBalance,
+            statement.CreditLimit,
+            statement.AvailableBalance,
+            financialSummary.BonifiableInterest,
+            financialSummary.MinimumPayment,
+            financialSummary.TotalToPay,
+            financialSummary.CashPaymentWithInterest,
+            monthlyTotals.CurrentMonthPurchases,
+            monthlyTotals.PreviousMonthPurchases,
+            pdfTransactions
+        );
+
+        return File(
+            pdf,
+            "application/pdf",
+            $"estado-cuenta-{cardId}.pdf"
+        );
     }
 
     [HttpPost("{cardId}/purchases")]
