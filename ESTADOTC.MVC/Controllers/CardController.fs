@@ -93,22 +93,18 @@ type CardController(apiService: ICardApiService) =
                         this.RedirectToAction("Index")
                         :> IActionResult
 
-                with
-                | :? InvalidOperationException as ex ->
+                    with
+                    | :? InvalidOperationException as ex ->
 
-                    this.TempData["ErrorMessage"] <-
-                        ex.Message
+                        this.TempData["ErrorMessage"] <-
+                            ex.Message
 
-                    let model =
-                        {
-                            TransactionDate = transactionDate
-                            Description = description
-                            Amount = amount
-                        }
+                        this.TempData["ReopenModal"] <-
+                            "purchase"
 
-                    return
-                        this.View(model)
-                        :> IActionResult
+                        return
+                            this.RedirectToAction("Index")
+                            :> IActionResult
         }
 
     [<HttpGet>]
@@ -164,14 +160,11 @@ type CardController(apiService: ICardApiService) =
                     this.TempData["ErrorMessage"] <-
                         ex.Message
 
-                    let model =
-                        {
-                            TransactionDate = transactionDate
-                            Amount = amount
-                        }
+                    this.TempData["ReopenModal"] <-
+                        "payment"
 
                     return
-                        this.View(model)
+                        this.RedirectToAction("Index")
                         :> IActionResult
         }
     

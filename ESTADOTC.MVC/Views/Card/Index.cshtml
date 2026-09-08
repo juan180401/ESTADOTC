@@ -3,223 +3,440 @@
 
 @{
     ViewData["Title"] = "Estado de cuenta";
+
+    var cardNumber = Model.Statement.CardNumber ?? string.Empty;
+
+    var lastFour = cardNumber.Length >= 4
+        ? cardNumber.Substring(cardNumber.Length - 4)
+        : cardNumber;
+
+    var purchaseCount = Model.CurrentMonthTransactions
+        .Count(x => x.TransactionType == "PURCHASE");
+
+    var paymentCount = Model.CurrentMonthTransactions
+        .Count(x => x.TransactionType == "PAYMENT");
 }
 
 <div class="container py-4">
 
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <!-- Page header -->
+    <div class="dashboard-header mb-4">
 
         <div>
-            <h1 class="fw-bold mb-1">Estado de cuenta</h1>
+            <span class="dashboard-eyebrow">
+                RESUMEN DE TARJETA
+            </span>
+
+            <h1 class="fw-bold mb-1">
+                Estado de cuenta
+            </h1>
+
             <p class="text-muted mb-0">
-                Información financiera de tu tarjeta
+                Consulta saldos, movimientos y obligaciones de tu tarjeta.
             </p>
         </div>
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="dashboard-actions">
 
-            <a asp-action="Purchase" class="btn btn-primary">
+            <button type="button"
+                    class="btn btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#purchaseModal">
                 + Registrar compra
-            </a>
+            </button>
 
-            <a asp-action="Payment" class="btn btn-success">
+            <button type="button"
+                    class="btn btn-success"
+                    data-bs-toggle="modal"
+                    data-bs-target="#paymentModal">
                 + Registrar pago
-            </a>
+            </button>
 
             <a asp-action="ExportPdf"
                class="btn btn-outline-dark">
+
                 Exportar PDF
+
             </a>
 
-            <span class="badge bg-primary fs-6 ms-2">
-                Tarjeta activa
-            </span>
-
         </div>
 
     </div>
 
-    <!-- Card information -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body p-4">
 
-            <div class="row align-items-center">
-
-                <div class="col-md-6">
-                    <p class="text-muted mb-1">Tarjetahabiente</p>
-                    <h3 class="fw-bold">@Model.Statement.HolderName</h3>
-
-                    <p class="mb-0">
-                        <span class="text-muted">Tarjeta:</span>
-                        @Model.Statement.CardNumber
-                    </p>
-                </div>
-
-                <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                    <p class="text-muted mb-1">Límite de crédito</p>
-
-                    <h2 class="fw-bold">
-                        @Model.Statement.CreditLimit.ToString("C")
-                    </h2>
-                </div>
-
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Balance cards -->
+    <!-- Main financial hero -->
     <div class="row g-4 mb-4">
 
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-2">Saldo actual</p>
+        <!-- Virtual card -->
+        <div class="col-lg-5">
 
-                    <h2 class="fw-bold">
-                        @Model.Statement.CurrentBalance.ToString("C")
-                    </h2>
+            <div class="credit-card-panel">
+
+                <div class="credit-card-top">
+
+                    <div>
+                        <span class="credit-card-brand">
+                            ESTADOTC
+                        </span>
+
+                        <span class="credit-card-subtitle">
+                            Crédito
+                        </span>
+                    </div>
+
+                    <span class="credit-card-status">
+                        Activa
+                    </span>
+
                 </div>
+
+                <div class="credit-card-chip"></div>
+
+                <div class="credit-card-number-row">
+
+                    <div id="cardNumber"
+                         class="credit-card-number"
+                         data-masked="•••• &nbsp; •••• &nbsp; •••• &nbsp; @lastFour"
+                         data-full="@cardNumber">
+
+                        •••• &nbsp; •••• &nbsp; •••• &nbsp; @lastFour
+
+                    </div>
+
+                    <button type="button"
+                            id="toggleCardNumber"
+                            class="card-eye-button"
+                            aria-label="Mostrar número de tarjeta"
+                            title="Mostrar número de tarjeta">
+
+                        <!-- Ojo cerrado -->
+                        <svg id="eyeClosedIcon"
+                             width="21"
+                             height="21"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round">
+
+                            <path d="M3 3l18 18" />
+                            <path d="M10.6 10.6a2 2 0 0 0 2.8 2.8" />
+                            <path d="M9.9 4.2A10.5 10.5 0 0 1 12 4
+                 c5 0 9 5 9 8
+                 a11.8 11.8 0 0 1-2 3.2" />
+                            <path d="M6.6 6.6
+                 C4.4 8.1 3 10.2 3 12
+                 c0 3 4 8 9 8
+                 a9.8 9.8 0 0 0 4.1-.9" />
+
+                        </svg>
+
+                        <!-- Ojo abierto -->
+                        <svg id="eyeOpenIcon"
+                             width="21"
+                             height="21"
+                             viewBox="0 0 24 24"
+                             fill="none"
+                             stroke="currentColor"
+                             stroke-width="2"
+                             stroke-linecap="round"
+                             stroke-linejoin="round"
+                             style="display:none;">
+
+                            <path d="M2 12
+                 s3.5-7 10-7
+                 10 7 10 7
+                 -3.5 7-10 7
+                 S2 12 2 12z" />
+
+                            <circle cx="12"
+                                    cy="12"
+                                    r="3" />
+
+                        </svg>
+
+                    </button>
+
+                </div>
+
+                <div class="credit-card-bottom">
+
+                    <div>
+                        <small>
+                            TARJETAHABIENTE
+                        </small>
+
+                        <strong>
+                            @Model.Statement.HolderName
+                        </strong>
+                    </div>
+
+                    <div class="text-end">
+                        <small>
+                            LÍMITE
+                        </small>
+
+                        <strong>
+                            @Model.Statement.CreditLimit.ToString("C")
+                        </strong>
+                    </div>
+
+                </div>
+
             </div>
+
         </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-2">Límite de crédito</p>
 
-                    <h2 class="fw-bold">
-                        @Model.Statement.CreditLimit.ToString("C")
-                    </h2>
+        <!-- Available credit -->
+        <div class="col-lg-7">
+
+            <div class="card h-100 border-0">
+
+                <div class="card-body p-4 p-lg-5">
+
+                    <div class="d-flex justify-content-between
+                                align-items-start
+                                mb-4">
+
+                        <div>
+
+                            <span class="financial-label">
+                                Crédito disponible
+                            </span>
+
+                            <h2 class="financial-main-value mb-1">
+                                @Model.Statement.AvailableBalance.ToString("C")
+                            </h2>
+
+                            <span class="text-muted">
+                                Disponible para nuevas compras
+                            </span>
+
+                        </div>
+
+                        <span class="financial-icon">
+                            $
+                        </span>
+
+                    </div>
+
+                    <hr />
+
+                    <div class="row mt-4">
+
+                        <div class="col-6">
+
+                            <span class="financial-label">
+                                Saldo utilizado
+                            </span>
+
+                            <h4 class="fw-bold mb-0 mt-1">
+                                @Model.Statement.CurrentBalance.ToString("C")
+                            </h4>
+
+                        </div>
+
+                        <div class="col-6 text-end">
+
+                            <span class="financial-label">
+                                Límite de crédito
+                            </span>
+
+                            <h4 class="fw-bold mb-0 mt-1">
+                                @Model.Statement.CreditLimit.ToString("C")
+                            </h4>
+
+                        </div>
+
+                    </div>
+
                 </div>
-            </div>
-        </div>
 
-        <div class="col-md-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body">
-                    <p class="text-muted mb-2">Crédito disponible</p>
-
-                    <h2 class="fw-bold">
-                        @Model.Statement.AvailableBalance.ToString("C")
-                    </h2>
-                </div>
             </div>
+
         </div>
 
     </div>
+
 
     <!-- Financial summary -->
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card border-0 mb-4">
 
-        <div class="card-header bg-white border-0 pt-4 px-4">
-            <h4 class="fw-bold mb-0">
-                Resumen financiero
-            </h4>
+        <div class="card-header bg-white px-4 pt-4 pb-3">
+
+            <div>
+
+                <span class="section-eyebrow">
+                    INFORMACIÓN DE PAGO
+                </span>
+
+                <h4 class="fw-bold mb-0 mt-1">
+                    Resumen financiero
+                </h4>
+
+            </div>
+
         </div>
 
         <div class="card-body p-4">
 
-            <div class="row g-4">
+            <div class="row g-3">
 
-                <div class="col-md-3">
-                    <p class="text-muted mb-1">
-                        Interés bonificable
-                    </p>
+                <div class="col-md-6 col-xl-3">
 
-                    <h4 class="fw-bold">
-                        @Model.FinancialSummary.BonifiableInterest.ToString("C")
-                    </h4>
+                    <div class="financial-summary-item">
+
+                        <span>
+                            Interés bonificable
+                        </span>
+
+                        <strong>
+                            @Model.FinancialSummary.BonifiableInterest.ToString("C")
+                        </strong>
+
+                    </div>
+
                 </div>
 
-                <div class="col-md-3">
-                    <p class="text-muted mb-1">
-                        Pago mínimo
-                    </p>
+                <div class="col-md-6 col-xl-3">
 
-                    <h4 class="fw-bold">
-                        @Model.FinancialSummary.MinimumPayment.ToString("C")
-                    </h4>
+                    <div class="financial-summary-item">
+
+                        <span>
+                            Pago mínimo
+                        </span>
+
+                        <strong>
+                            @Model.FinancialSummary.MinimumPayment.ToString("C")
+                        </strong>
+
+                    </div>
+
                 </div>
 
-                <div class="col-md-3">
-                    <p class="text-muted mb-1">
-                        Total a pagar
-                    </p>
+                <div class="col-md-6 col-xl-3">
 
-                    <h4 class="fw-bold">
-                        @Model.FinancialSummary.TotalToPay.ToString("C")
-                    </h4>
+                    <div class="financial-summary-item">
+
+                        <span>
+                            Total a pagar
+                        </span>
+
+                        <strong>
+                            @Model.FinancialSummary.TotalToPay.ToString("C")
+                        </strong>
+
+                    </div>
+
                 </div>
 
-                <div class="col-md-3">
-                    <p class="text-muted mb-1">
-                        Pago con interés
-                    </p>
+                <div class="col-md-6 col-xl-3">
 
-                    <h4 class="fw-bold">
-                        @Model.FinancialSummary.CashPaymentWithInterest.ToString("C")
-                    </h4>
+                    <div class="financial-summary-item financial-summary-important">
+
+                        <span>
+                            Pago con interés
+                        </span>
+
+                        <strong>
+                            @Model.FinancialSummary.CashPaymentWithInterest.ToString("C")
+                        </strong>
+
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
+
     </div>
+
 
     <!-- Monthly purchases -->
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="row g-4 mb-4">
 
-        <div class="card-header bg-white border-0 pt-4 px-4">
-            <h4 class="fw-bold mb-0">
-                Compras
-            </h4>
-        </div>
+        <div class="col-md-6">
 
-        <div class="card-body p-4">
+            <div class="card border-0 h-100 monthly-card">
 
-            <div class="row">
+                <div class="card-body p-4">
 
-                <div class="col-md-6">
-                    <p class="text-muted mb-1">
+                    <span class="financial-label">
                         Compras del mes actual
-                    </p>
+                    </span>
 
-                    <h3 class="fw-bold">
+                    <h2 class="fw-bold mt-2 mb-1">
                         @Model.MonthlyTotals.CurrentMonthPurchases.ToString("C")
-                    </h3>
-                </div>
+                    </h2>
 
-                <div class="col-md-6">
-                    <p class="text-muted mb-1">
-                        Compras del mes anterior
-                    </p>
+                    <span class="text-muted">
+                        Consumo acumulado durante este mes
+                    </span>
 
-                    <h3 class="fw-bold">
-                        @Model.MonthlyTotals.PreviousMonthPurchases.ToString("C")
-                    </h3>
                 </div>
 
             </div>
 
         </div>
+
+        <div class="col-md-6">
+
+            <div class="card border-0 h-100 monthly-card">
+
+                <div class="card-body p-4">
+
+                    <span class="financial-label">
+                        Compras del mes anterior
+                    </span>
+
+                    <h2 class="fw-bold mt-2 mb-1">
+                        @Model.MonthlyTotals.PreviousMonthPurchases.ToString("C")
+                    </h2>
+
+                    <span class="text-muted">
+                        Consumo registrado durante el mes anterior
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
+
     <!-- Transactions -->
-    <div class="card shadow-sm border-0">
+    <div class="card border-0">
 
-        <div class="card-header bg-white border-0 pt-4 px-4">
+        <div class="card-header bg-white px-4 pt-4 pb-3">
 
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex flex-column
+                        flex-md-row
+                        justify-content-between
+                        align-items-md-center
+                        gap-3">
 
-                <h4 class="fw-bold mb-0">
-                    Movimientos del mes
-                </h4>
+                <div>
+
+                    <span class="section-eyebrow">
+                        ACTIVIDAD RECIENTE
+                    </span>
+
+                    <h4 class="fw-bold mb-0 mt-1">
+                        Movimientos del mes
+                    </h4>
+
+                </div>
 
                 <a asp-action="Transactions"
                    class="btn btn-outline-primary">
+
                     Ver historial completo
+
                 </a>
 
             </div>
@@ -228,33 +445,107 @@
 
         <div class="card-body p-0">
 
-            @if (Model.CurrentMonthTransactions.Any()) {
+            @if (Model.CurrentMonthTransactions.Any())
+            {
+            <!-- jQuery filters -->
+            <div class="transaction-toolbar px-4 py-3">
+
+                <span class="transaction-filter-label">
+                    Mostrar:
+                </span>
+
+                <div class="transaction-filters">
+
+                    <button type="button"
+                            class="btn transaction-filter active"
+                            data-filter="ALL">
+
+                        Todos
+
+                        <span class="filter-count">
+                            @Model.CurrentMonthTransactions.Count()
+                        </span>
+
+                    </button>
+
+                    <button type="button"
+                            class="btn transaction-filter"
+                            data-filter="PURCHASE">
+
+                        Compras
+
+                        <span class="filter-count">
+                            @purchaseCount
+                        </span>
+
+                    </button>
+
+                    <button type="button"
+                            class="btn transaction-filter"
+                            data-filter="PAYMENT">
+
+                        Pagos
+
+                        <span class="filter-count">
+                            @paymentCount
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
 
             <div class="table-responsive">
 
-                <table class="table table-hover align-middle mb-0">
+                <table class="table
+                                  table-hover
+                                  align-middle
+                                  mb-0"
+                       id="transactionsTable">
 
-                    <thead class="table-light">
+                    <thead>
+
                         <tr>
-                            <th class="px-4">Fecha</th>
-                            <th>Descripción</th>
-                            <th>Tipo</th>
-                            <th class="text-end px-4">Monto</th>
+
+                            <th class="px-4">
+                                Fecha
+                            </th>
+
+                            <th>
+                                Descripción
+                            </th>
+
+                            <th>
+                                Tipo
+                            </th>
+
+                            <th class="text-end px-4">
+                                Monto
+                            </th>
+
                         </tr>
+
                     </thead>
 
                     <tbody>
 
                         @foreach (var transaction in Model.CurrentMonthTransactions)
                         {
-                        <tr>
+                        <tr class="transaction-row"
+                            data-type="@transaction.TransactionType">
 
                             <td class="px-4">
                                 @transaction.TransactionDate.ToString("dd/MM/yyyy")
                             </td>
 
                             <td>
-                                @transaction.Description
+
+                                <strong class="transaction-description">
+                                    @transaction.Description
+                                </strong>
+
                             </td>
 
                             <td>
@@ -275,7 +566,20 @@
                             </td>
 
                             <td class="text-end px-4 fw-bold">
-                                @transaction.Amount.ToString("C")
+
+                                @if (transaction.TransactionType == "PURCHASE")
+                                {
+                                <span class="transaction-purchase">
+                                    - @transaction.Amount.ToString("C")
+                                </span>
+                                }
+                                else
+                                {
+                                <span class="transaction-payment">
+                                    + @transaction.Amount.ToString("C")
+                                </span>
+                                }
+
                             </td>
 
                         </tr>
@@ -287,16 +591,265 @@
 
             </div>
 
+
+            <div id="noFilteredTransactions"
+                 class="p-5 text-center text-muted"
+                 style="display:none;">
+
+                No existen movimientos del tipo seleccionado.
+
+            </div>
             }
             else
             {
-            <div class="p-4 text-center text-muted">
+            <div class="p-5 text-center text-muted">
+
                 No existen movimientos durante el mes actual.
+
             </div>
             }
 
         </div>
+
     </div>
+
+    <!-- ======================================================
+     MODAL REGISTRAR COMPRA
+     ====================================================== -->
+
+    <div class="modal fade"
+         id="purchaseModal"
+         tabindex="-1"
+         aria-labelledby="purchaseModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header operation-modal-header">
+
+                    <div>
+                        <span class="section-eyebrow">
+                            NUEVA OPERACIÓN
+                        </span>
+
+                        <h4 class="modal-title fw-bold mt-1"
+                            id="purchaseModalLabel">
+                            Registrar compra
+                        </h4>
+                    </div>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar">
+                    </button>
+
+                </div>
+
+                <form asp-action="Purchase"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-body p-4">
+
+                        <div class="operation-icon operation-icon-purchase">
+                            $
+                        </div>
+
+                        <p class="text-muted mb-4">
+                            Ingresa los datos de la compra que deseas registrar.
+                        </p>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Fecha de compra
+                            </label>
+
+                            <input type="date"
+                                   name="transactionDate"
+                                   class="form-control"
+                                   value="@DateTime.Today.ToString(" yyyy-MM-dd")" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Descripción
+                            </label>
+
+                            <input type="text"
+                                   name="description"
+                                   class="form-control"
+                                   placeholder="Ej. Compra en supermercado" />
+
+                        </div>
+
+                        <div class="mb-2">
+
+                            <label class="form-label">
+                                Monto
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    $
+                                </span>
+
+                                <input type="number"
+                                       name="amount"
+                                       class="form-control"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="0.00" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary px-4">
+                            Registrar compra
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ======================================================
+         MODAL REGISTRAR PAGO
+         ====================================================== -->
+
+    <div class="modal fade"
+         id="paymentModal"
+         tabindex="-1"
+         aria-labelledby="paymentModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-header operation-modal-header">
+
+                    <div>
+                        <span class="section-eyebrow">
+                            NUEVA OPERACIÓN
+                        </span>
+
+                        <h4 class="modal-title fw-bold mt-1"
+                            id="paymentModalLabel">
+                            Registrar pago
+                        </h4>
+                    </div>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar">
+                    </button>
+
+                </div>
+
+                <form asp-action="Payment"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-body p-4">
+
+                        <div class="operation-icon operation-icon-payment">
+                            ✓
+                        </div>
+
+                        <p class="text-muted mb-4">
+                            Registra un pago realizado a tu tarjeta.
+                        </p>
+
+                        <div class="mb-3">
+
+                            <label class="form-label">
+                                Fecha del pago
+                            </label>
+
+                            <input type="date"
+                                   name="transactionDate"
+                                   class="form-control"
+                                   value="@DateTime.Today.ToString(" yyyy-MM-dd")" />
+
+                        </div>
+
+                        <div class="mb-2">
+
+                            <label class="form-label">
+                                Monto del pago
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    $
+                                </span>
+
+                                <input type="number"
+                                       name="amount"
+                                       class="form-control"
+                                       step="0.01"
+                                       min="0.01"
+                                       placeholder="0.00" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer border-0 px-4 pb-4 pt-0">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-success px-4">
+                            Registrar pago
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Success modal -->
     @if (TempData["SuccessMessage"] != null)
     {
     <div class="modal fade"
@@ -305,12 +858,13 @@
          aria-hidden="true">
 
         <div class="modal-dialog modal-dialog-centered">
+
             <div class="modal-content border-0 shadow">
 
                 <div class="modal-body text-center p-5">
 
-                    <div class="mb-3">
-                        <span class="display-4">✓</span>
+                    <div class="success-icon mb-3">
+                        ✓
                     </div>
 
                     <h3 class="fw-bold mb-2">
@@ -324,23 +878,172 @@
                     <button type="button"
                             class="btn btn-primary px-4"
                             data-bs-dismiss="modal">
+
                         Aceptar
+
                     </button>
 
                 </div>
 
             </div>
+
         </div>
+
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+
             var modal = new bootstrap.Modal(
                 document.getElementById("successModal")
             );
 
             modal.show();
+
         });
     </script>
     }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+    <div class="modal fade"
+         id="errorModal"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-body text-center p-5">
+
+                    <div class="mb-3">
+                        <span class="display-4 text-danger">
+                            !
+                        </span>
+                    </div>
+
+                    <h3 class="fw-bold mb-2">
+                        Operación no permitida
+                    </h3>
+
+                    <p class="text-muted mb-4">
+                        @TempData["ErrorMessage"]
+                    </p>
+
+                    <button type="button"
+                            class="btn btn-danger px-4"
+                            data-bs-dismiss="modal">
+                        Entendido
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    }
+
+    @section Scripts {
+    <script>
+        $(function () {
+
+            var hasError =
+                @((TempData["ErrorMessage"] != null).ToString().ToLower());
+
+            var reopenModal =
+                '@(TempData["ReopenModal"] ?? "")';
+
+            if (hasError) {
+
+                var errorModalElement =
+                    document.getElementById("errorModal");
+
+                var errorModal =
+                    new bootstrap.Modal(errorModalElement);
+
+                errorModal.show();
+
+                errorModalElement.addEventListener(
+                    "hidden.bs.modal",
+                    function () {
+
+                        if (reopenModal === "purchase") {
+
+                            var purchaseModal =
+                                new bootstrap.Modal(
+                                    document.getElementById("purchaseModal")
+                                );
+
+                            purchaseModal.show();
+                        }
+
+                        if (reopenModal === "payment") {
+
+                            var paymentModal =
+                                new bootstrap.Modal(
+                                    document.getElementById("paymentModal")
+                                );
+
+                            paymentModal.show();
+                        }
+
+                    }
+                );
+            }
+
+        });
+    </script>
+    }
+
+    <div class="modal fade"
+         id="confirmCardNumberModal"
+         tabindex="-1"
+         aria-labelledby="confirmCardNumberModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content border-0 shadow">
+
+                <div class="modal-body text-center p-5">
+
+                    <div class="sensitive-data-icon mb-3">
+                        !
+                    </div>
+
+                    <h3 class="fw-bold mb-2"
+                        id="confirmCardNumberModalLabel">
+                        Mostrar número de tarjeta
+                    </h3>
+
+                    <p class="text-muted mb-4">
+                        ¿Estás seguro de que deseas mostrar el número completo de la tarjeta?
+                    </p>
+
+                    <div class="d-flex justify-content-center gap-2">
+
+                        <button type="button"
+                                class="btn btn-outline-secondary px-4"
+                                data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="button"
+                                id="confirmShowCardNumber"
+                                class="btn btn-primary px-4">
+                            Sí, mostrar
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
 </div>

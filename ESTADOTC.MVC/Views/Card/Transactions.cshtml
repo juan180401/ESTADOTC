@@ -1,85 +1,284 @@
 ﻿@model Microsoft.FSharp.Collections.FSharpList<ESTADOTC.MVC.Models.TransactionViewModel>
-@using System.Linq
+    @using System.Linq
 
-@{
+    @{
     ViewData["Title"] = "Historial de movimientos";
-}
 
-<div class="container py-4">
+    var purchaseCount = Model.Count(x => x.TransactionType == "PURCHASE");
+    var paymentCount = Model.Count(x => x.TransactionType == "PAYMENT");
+    }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-1">Historial de movimientos</h1>
-            <p class="text-muted mb-0">
-                Consulta todos los movimientos de tu tarjeta
-            </p>
+    <div class="container py-4">
+
+        <div class="dashboard-header mb-4">
+
+            <div>
+
+                <span class="dashboard-eyebrow">
+                    HISTORIAL
+                </span>
+
+                <h1 class="fw-bold mb-1">
+                    Movimientos
+                </h1>
+
+                <p class="text-muted mb-0">
+                    Consulta el historial de transacciones de tu tarjeta.
+                </p>
+
+            </div>
+
+            <a asp-action="Index"
+               class="btn btn-outline-secondary">
+                ← Volver al estado de cuenta
+            </a>
+
         </div>
 
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            ← Volver
-        </a>
-    </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
+        <div class="row g-4 mb-4">
 
-            @if (Model.Any())
-            {
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th class="px-4">Fecha</th>
-                            <th>Descripción</th>
-                            <th>Tipo</th>
-                            <th class="text-end px-4">Monto</th>
-                        </tr>
-                    </thead>
+            <div class="col-md-4">
 
-                    <tbody>
-                        @foreach (var transaction in Model)
-                        {
-                        <tr>
-                            <td class="px-4">
-                                @transaction.TransactionDate.ToString("dd/MM/yyyy")
-                            </td>
+                <div class="card border-0 h-100">
 
-                            <td>
-                                @transaction.Description
-                            </td>
+                    <div class="card-body p-4">
 
-                            <td>
-                                @if (transaction.TransactionType == "PURCHASE")
-                                {
-                                <span class="badge bg-danger">
-                                    Compra
-                                </span>
-                                }
-                                else
-                                {
-                                <span class="badge bg-success">
-                                    Pago
-                                </span>
-                                }
-                            </td>
+                        <span class="financial-label">
+                            Total de movimientos
+                        </span>
 
-                            <td class="text-end px-4 fw-bold">
-                                @transaction.Amount.ToString("C")
-                            </td>
-                        </tr>
-                        }
-                    </tbody>
-                </table>
+                        <h2 class="fw-bold mt-2 mb-0">
+                            @Model.Count()
+                        </h2>
+
+                    </div>
+
+                </div>
+
             </div>
-            }
-            else
-            {
-            <div class="p-4 text-center text-muted">
-                No existen movimientos registrados.
+
+            <div class="col-md-4">
+
+                <div class="card border-0 h-100">
+
+                    <div class="card-body p-4">
+
+                        <span class="financial-label">
+                            Compras
+                        </span>
+
+                        <h2 class="fw-bold mt-2 mb-0 text-danger">
+                            @purchaseCount
+                        </h2>
+
+                    </div>
+
+                </div>
+
             </div>
-            }
+
+            <div class="col-md-4">
+
+                <div class="card border-0 h-100">
+
+                    <div class="card-body p-4">
+
+                        <span class="financial-label">
+                            Pagos
+                        </span>
+
+                        <h2 class="fw-bold mt-2 mb-0 text-success">
+                            @paymentCount
+                        </h2>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
-    </div>
 
-</div>
+
+        <div class="card border-0">
+
+            <div class="card-header bg-white px-4 pt-4 pb-3">
+
+                <div>
+
+                    <span class="section-eyebrow">
+                        TRANSACCIONES
+                    </span>
+
+                    <h4 class="fw-bold mb-0 mt-1">
+                        Historial completo
+                    </h4>
+
+                </div>
+
+            </div>
+
+            <div class="card-body p-0">
+
+                @if (Model.Any())
+                {
+                <div class="transaction-toolbar px-4 py-3">
+
+                    <span class="transaction-filter-label">
+                        Mostrar:
+                    </span>
+
+                    <div class="transaction-filters">
+
+                        <button type="button"
+                                class="btn transaction-filter active"
+                                data-filter="ALL">
+
+                            Todos
+
+                            <span class="filter-count">
+                                @Model.Count()
+                            </span>
+
+                        </button>
+
+                        <button type="button"
+                                class="btn transaction-filter"
+                                data-filter="PURCHASE">
+
+                            Compras
+
+                            <span class="filter-count">
+                                @purchaseCount
+                            </span>
+
+                        </button>
+
+                        <button type="button"
+                                class="btn transaction-filter"
+                                data-filter="PAYMENT">
+
+                            Pagos
+
+                            <span class="filter-count">
+                                @paymentCount
+                            </span>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <div class="table-responsive">
+
+                    <table class="table table-hover align-middle mb-0"
+                           id="transactionsTable">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="px-4">
+                                    Fecha
+                                </th>
+
+                                <th>
+                                    Descripción
+                                </th>
+
+                                <th>
+                                    Tipo
+                                </th>
+
+                                <th class="text-end px-4">
+                                    Monto
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var transaction in Model)
+                            {
+                            <tr class="transaction-row"
+                                data-type="@transaction.TransactionType">
+
+                                <td class="px-4">
+                                    @transaction.TransactionDate.ToString("dd/MM/yyyy")
+                                </td>
+
+                                <td>
+                                    <strong>
+                                        @transaction.Description
+                                    </strong>
+                                </td>
+
+                                <td>
+
+                                    @if (transaction.TransactionType == "PURCHASE")
+                                    {
+                                    <span class="badge bg-danger">
+                                        Compra
+                                    </span>
+                                    }
+                                    else
+                                    {
+                                    <span class="badge bg-success">
+                                        Pago
+                                    </span>
+                                    }
+
+                                </td>
+
+                                <td class="text-end px-4 fw-bold">
+
+                                    @if (transaction.TransactionType == "PURCHASE")
+                                    {
+                                    <span class="transaction-purchase">
+                                        - @transaction.Amount.ToString("C")
+                                    </span>
+                                    }
+                                    else
+                                    {
+                                    <span class="transaction-payment">
+                                        + @transaction.Amount.ToString("C")
+                                    </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <div id="noFilteredTransactions"
+                     class="p-5 text-center text-muted"
+                     style="display:none;">
+
+                    No existen movimientos del tipo seleccionado.
+
+                </div>
+                }
+                else
+                {
+                <div class="p-5 text-center text-muted">
+                    No existen movimientos registrados.
+                </div>
+                }
+
+            </div>
+
+        </div>
+
+    </div>
