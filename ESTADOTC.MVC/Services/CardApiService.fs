@@ -3,10 +3,34 @@
 open System
 open System.Net.Http
 open System.Net.Http.Json
+open System.Text.Json
 open System.Threading.Tasks
 open ESTADOTC.MVC.Models
 
 type CardApiService(httpClient: HttpClient) =
+
+    let getErrorMessageAsync (response: HttpResponseMessage) =
+        task {
+            let! content =
+                response.Content.ReadAsStringAsync()
+
+            try
+                use document =
+                    JsonDocument.Parse(content)
+
+                let mutable title =
+                    Unchecked.defaultof<JsonElement>
+
+                if document.RootElement.TryGetProperty("title", &title) then
+                    return title.GetString()
+                           |> Option.ofObj
+                           |> Option.defaultValue "No fue posible realizar la operación."
+                else
+                    return "No fue posible realizar la operación."
+            with
+            | _ ->
+                return "No fue posible realizar la operación."
+        }
 
     member _.GetCardStatementAsync(cardId: int) =
         httpClient.GetFromJsonAsync<CardStatementViewModel>(
@@ -51,9 +75,11 @@ type CardApiService(httpClient: HttpClient) =
     ) =
         task {
             let request: AddPurchaseViewModel =
-                { TransactionDate = transactionDate
-                  Description = description
-                  Amount = amount }
+                {
+                    TransactionDate = transactionDate
+                    Description = description
+                    Amount = amount
+                }
 
             let! response =
                 httpClient.PostAsJsonAsync(
@@ -61,7 +87,11 @@ type CardApiService(httpClient: HttpClient) =
                     request
                 )
 
-            response.EnsureSuccessStatusCode() |> ignore
+            if not response.IsSuccessStatusCode then
+                let! message =
+                    getErrorMessageAsync response
+
+                raise (InvalidOperationException(message))
         }
 
     member _.AddPaymentAsync(
@@ -71,8 +101,10 @@ type CardApiService(httpClient: HttpClient) =
     ) =
         task {
             let request: AddPaymentViewModel =
-                { TransactionDate = transactionDate
-                  Amount = amount }
+                {
+                    TransactionDate = transactionDate
+                    Amount = amount
+                }
 
             let! response =
                 httpClient.PostAsJsonAsync(
@@ -80,7 +112,11 @@ type CardApiService(httpClient: HttpClient) =
                     request
                 )
 
-            response.EnsureSuccessStatusCode() |> ignore
+            if not response.IsSuccessStatusCode then
+                let! message =
+                    getErrorMessageAsync response
+
+                raise (InvalidOperationException(message))
         }
 
     member _.DownloadStatementPdfAsync(cardId: int) =
@@ -99,6 +135,7 @@ type CardApiService(httpClient: HttpClient) =
         }
 
     interface ICardApiService with
+
         member this.GetCardStatementAsync(cardId) =
             this.GetCardStatementAsync(cardId)
 
@@ -114,11 +151,29 @@ type CardApiService(httpClient: HttpClient) =
         member this.GetFinancialSummaryAsync(cardId) =
             this.GetFinancialSummaryAsync(cardId)
 
-        member this.AddPurchaseAsync(cardId, transactionDate, description, amount) =
-            this.AddPurchaseAsync(cardId, transactionDate, description, amount)
+        member this.AddPurchaseAsync(
+            cardId,
+            transactionDate,
+            description,
+            amount
+        ) =
+            this.AddPurchaseAsync(
+                cardId,
+                transactionDate,
+                description,
+                amount
+            )
 
-        member this.AddPaymentAsync(cardId, transactionDate, amount) =
-            this.AddPaymentAsync(cardId, transactionDate, amount)
+        member this.AddPaymentAsync(
+            cardId,
+            transactionDate,
+            amount
+        ) =
+            this.AddPaymentAsync(
+                cardId,
+                transactionDate,
+                amount
+            )
 
         member this.DownloadStatementPdfAsync(cardId) =
             this.DownloadStatementPdfAsync(cardId)

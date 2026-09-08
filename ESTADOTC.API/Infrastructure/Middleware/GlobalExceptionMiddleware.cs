@@ -26,21 +26,47 @@ public class GlobalExceptionMiddleware
         {
             _logger.LogError(
                 ex,
-                "Error no controlado durante la ejecución de la solicitud.");
+                "Error durante la ejecución de la solicitud.");
 
-            await HandleExceptionAsync(context);
+            await HandleExceptionAsync(context, ex);
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context)
+    private static async Task HandleExceptionAsync(
+        HttpContext context,
+        Exception exception)
     {
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        var statusCode = exception switch
+        {
+            InvalidOperationException =>
+                HttpStatusCode.BadRequest,
+
+            KeyNotFoundException =>
+                HttpStatusCode.NotFound,
+
+            _ =>
+                HttpStatusCode.InternalServerError
+        };
+
+        var title = exception switch
+        {
+            InvalidOperationException =>
+                exception.Message,
+
+            KeyNotFoundException =>
+                exception.Message,
+
+            _ =>
+                "Ocurrió un error interno en el servidor."
+        };
+
+        context.Response.StatusCode = (int)statusCode;
         context.Response.ContentType = "application/json";
 
         var response = new
         {
             status = context.Response.StatusCode,
-            title = "Ocurrió un error interno en el servidor.",
+            title,
             traceId = context.TraceIdentifier
         };
 

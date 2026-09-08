@@ -77,16 +77,38 @@ type CardController(apiService: ICardApiService) =
 
                 return this.View(model) :> IActionResult
             else
-                do!
-                    apiService.AddPurchaseAsync(
-                        1,
-                        transactionDate,
-                        description,
-                        amount
-                    )
+                try
+                    do!
+                        apiService.AddPurchaseAsync(
+                            1,
+                            transactionDate,
+                            description,
+                            amount
+                        )
 
-                this.TempData["SuccessMessage"] <- "Compra registrada correctamente."
-                return this.RedirectToAction("Index") :> IActionResult
+                    this.TempData["SuccessMessage"] <-
+                        "Compra registrada correctamente."
+
+                    return
+                        this.RedirectToAction("Index")
+                        :> IActionResult
+
+                with
+                | :? InvalidOperationException as ex ->
+
+                    this.TempData["ErrorMessage"] <-
+                        ex.Message
+
+                    let model =
+                        {
+                            TransactionDate = transactionDate
+                            Description = description
+                            Amount = amount
+                        }
+
+                    return
+                        this.View(model)
+                        :> IActionResult
         }
 
     [<HttpGet>]
@@ -121,15 +143,36 @@ type CardController(apiService: ICardApiService) =
 
                 return this.View(model) :> IActionResult
             else
-                do!
-                    apiService.AddPaymentAsync(
-                        1,
-                        transactionDate,
-                        amount
-                    )
+                try
+                    do!
+                        apiService.AddPaymentAsync(
+                            1,
+                            transactionDate,
+                            amount
+                        )
 
-                this.TempData["SuccessMessage"] <- "Pago registrado correctamente."
-                return this.RedirectToAction("Index") :> IActionResult
+                    this.TempData["SuccessMessage"] <-
+                        "Pago registrado correctamente."
+
+                    return
+                        this.RedirectToAction("Index")
+                        :> IActionResult
+
+                with
+                | :? InvalidOperationException as ex ->
+
+                    this.TempData["ErrorMessage"] <-
+                        ex.Message
+
+                    let model =
+                        {
+                            TransactionDate = transactionDate
+                            Amount = amount
+                        }
+
+                    return
+                        this.View(model)
+                        :> IActionResult
         }
     
     [<HttpGet>]
