@@ -1,0 +1,106 @@
+{
+  "info": {
+    "name": "ESTADOTC API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://localhost:7104"
+    },
+    {
+      "key": "cardId",
+      "value": "1"
+    }
+  ],
+  "item": [
+    {
+      "name": "Healthcheck",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/health"
+      }
+    },
+    {
+      "name": "Cards",
+      "item": [
+        {
+          "name": "Get Card Statement",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/statement"
+          }
+        },
+        {
+          "name": "Get Transactions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/transactions"
+          }
+        },
+        {
+          "name": "Get Current Month Transactions",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/transactions/current-month"
+          }
+        },
+        {
+          "name": "Get Monthly Purchase Totals",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/monthly-purchase-totals"
+          }
+        },
+        {
+          "name": "Get Financial Summary",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/financial-summary"
+          }
+        },
+        {
+          "name": "Add Purchase",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionDate\": \"2026-09-07\",\n  \"description\": \"Compra de prueba Postman\",\n  \"amount\": 25.00\n}"
+            },
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/purchases"
+          }
+        },
+        {
+          "name": "Add Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transactionDate\": \"2026-09-07\",\n  \"amount\": 10.00\n}"
+            },
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/payments"
+          }
+        },
+        {
+          "name": "Download Statement PDF",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/cards/{{cardId}}/statement/pdf"
+          }
+        }
+      ]
+    }
+  ]
+}
