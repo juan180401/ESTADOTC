@@ -142,3 +142,19 @@ type CardController(apiService: ICardApiService) =
 
             return this.View(transactions)
         }
+
+    [<HttpGet>]
+        member this.ExportPdf() =
+            task {
+                let cardId = 1
+
+                let! pdf =
+                    apiService.DownloadStatementPdfAsync(cardId)
+
+                return
+                    this.File(
+                        pdf,
+                        "application/pdf",
+                        $"estado-cuenta-{cardId}.pdf"
+                    )
+            }

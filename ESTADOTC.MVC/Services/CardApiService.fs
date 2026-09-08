@@ -83,6 +83,21 @@ type CardApiService(httpClient: HttpClient) =
             response.EnsureSuccessStatusCode() |> ignore
         }
 
+    member _.DownloadStatementPdfAsync(cardId: int) =
+        task {
+            let! response =
+                httpClient.GetAsync(
+                    $"api/cards/{cardId}/statement/pdf"
+                )
+
+            response.EnsureSuccessStatusCode() |> ignore
+
+            let! bytes =
+                response.Content.ReadAsByteArrayAsync()
+
+            return bytes
+        }
+
     interface ICardApiService with
         member this.GetCardStatementAsync(cardId) =
             this.GetCardStatementAsync(cardId)
@@ -104,3 +119,6 @@ type CardApiService(httpClient: HttpClient) =
 
         member this.AddPaymentAsync(cardId, transactionDate, amount) =
             this.AddPaymentAsync(cardId, transactionDate, amount)
+
+        member this.DownloadStatementPdfAsync(cardId) =
+            this.DownloadStatementPdfAsync(cardId)
