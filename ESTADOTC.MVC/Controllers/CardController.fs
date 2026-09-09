@@ -174,7 +174,7 @@ type CardController(apiService: ICardApiService) =
             let cardId = 1
 
             let! transactions =
-                apiService.GetTransactionsAsync(cardId)
+                apiService.GetCurrentMonthTransactionsAsync(cardId)
 
             return this.View(transactions)
         }
